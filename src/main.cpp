@@ -36,11 +36,11 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", -3 * 3600, 60000);
 String nomeDevice = "NeuverseESP32";
 
 void log(String mens,String tipo = "DEBUG") {
-  if(tipo == "TESTE"){
+  //if(tipo == "TESTE"){
     Serial.println(dataGlobal+" "+tipo+" "+mens);
     globalUltimoLog = mens;
     globalUltimoLog = globalUltimoLog.substring(0,20);    
-  }
+  //}
   /*if(SerialBT.available()){
       SerialBT.println(dataGlobal+" "+tipo+" "+mens);
   }*/
@@ -315,7 +315,8 @@ void WiFiEvent(WiFiEvent_t event)
       log(WiFi.localIPv6().toString());
     break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-      ESP.restart();
+      //if(!ipGlobal.equals(""))
+      //  ESP.restart();
     break;
     case SYSTEM_EVENT_STA_LOST_IP:
       ipGlobal = "";
@@ -531,13 +532,13 @@ void iniciaWifi() {
   if(config["ssidSessao"]["ssid"] == "") {
     log("Criando confInicial","INFO");
     WiFi.begin("Escritorio","80818283");
-    config["ssidSessao"]["ssid"] = "Escritorio";
-    config["ssidSessao"]["password"] = "80818283";
-    config["servidorSessao"]["endereco"] = "192.168.10.254";
+    config["ssidSessao"]["ssid"] = "Mariano_2G";
+    config["ssidSessao"]["password"] = "20061977";
+    config["servidorSessao"]["endereco"] = "192.168.0.254";
     config["servidorSessao"]["porta"] = "27015";
     config["conectorSessao"]["usuario"] = "neuverse";
     config["conectorSessao"]["senha"] = "neuverse";
-    config["servidorRestSessao"]["ip"] = "192.168.10.7";
+    config["servidorRestSessao"]["ip"] = "192.168.0.254";
     config["servidorRestSessao"]["porta"] = 8080;
     for(int i = 0 ;i<1;i++) {
       DynamicJsonDocument buttonIOT(2048);
@@ -733,11 +734,9 @@ void processar(String dados) {
 
 void taskCliente(void *arg) {
   
-  String server = config["servidorSessao"]["endereco"];
-  uint16_t porta = config["servidorSessao"]["porta"];
   int32_t timeout = 10000;
   while(1) {
-    log("Cliente tcp conectando.","TESTE");
+    log("Cliente tcp conectando para."+server+":"+porta,"TESTE");
     if (cli.connect(server.c_str(), porta,timeout)) {
       log("Cliente tcp conectado.","TESTE");
       cli.print(login());
@@ -753,6 +752,8 @@ void taskCliente(void *arg) {
       }
       cli.stop();   
     }
+    else
+      log("Falha cliente tcp ao conectar para."+server+":"+porta,"TESTE");
     vTaskDelay(1000);
   }
 }
